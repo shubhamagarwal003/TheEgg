@@ -37,6 +37,11 @@ namespace Assets.castle.Scripts
             _renderer.material.color = new Color(1, _navAgent.remainingDistance / 50, _navAgent.remainingDistance / 50);
         }
 
+        public void DoDamage(float damage)
+        {
+            _health.DoDamage(damage);
+        }
+
         private IEnumerator Attack()
         {
             while (true)
