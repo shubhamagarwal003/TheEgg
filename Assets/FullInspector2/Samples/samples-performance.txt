@@ -1,0 +1,5 @@
+Running the performance samples is simple. Please follow the directions below:
+
+1. Create a new scene
+2. Enter play mode
+3. Select "Window/Full Inspector/Run Performance Sample"

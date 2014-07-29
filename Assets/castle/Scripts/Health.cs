@@ -1,20 +1,16 @@
 ﻿using System;
+using FullInspector;
 using UnityEngine;
 
 namespace Assets.castle.Scripts
 {
-    public class Health : MonoBehaviour
+    public class Health : BaseBehavior<JsonNetSerializer>
     {
-        private float _maxHealth;
-        private float _remainingHealth;
-        private float _maxArmor;
-        private float _remainingArmor;
-
-        public float MaxHealth { get { return _maxHealth; } }
-        public float MaxArmor { get { return _maxArmor; } }
-        public float CurrentHealth { get { return _remainingHealth; } }
-        public float CurrentArmor { get { return _remainingArmor; } }
-        public float PercentHp { get { return _remainingHealth / _maxHealth; } }
+        public float MaxHealth { get; private set; }
+        public float MaxArmor { get; private set; }
+        public float CurrentHealth { get; private set; }
+        public float CurrentArmor { get; private set; }
+        public float PercentHp { get { return CurrentHealth / MaxHealth; } }
 
         public enum HealthClass
         {
@@ -38,16 +34,16 @@ namespace Assets.castle.Scripts
             switch (hClass)
             {
                 case HealthClass.Heavy:
-                    _maxHealth = 1000;
-                    _maxArmor = 2000;
+                    MaxHealth = 1000;
+                    MaxArmor = 2000;
                     break;
                 case HealthClass.Normal:
-                    _maxHealth = 100;
-                    _maxArmor = 100;
+                    MaxHealth = 100;
+                    MaxArmor = 100;
                     break;
                 case HealthClass.Light:
-                    _maxHealth = 75;
-                    _maxArmor = 50;
+                    MaxHealth = 75;
+                    MaxArmor = 50;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("hClass");
@@ -58,18 +54,18 @@ namespace Assets.castle.Scripts
 
         public void FullHeal()
         {
-            _remainingHealth = _maxHealth;
-            _remainingArmor = _maxArmor;
+            CurrentHealth = MaxHealth;
+            CurrentArmor = MaxArmor;
         }
 
         public void DoDamage(float damage)
         {
-            var damageReduction = _remainingArmor / _maxArmor;
-            _remainingArmor -= damage;
-            if (_remainingArmor > 0)
-                _remainingArmor = 0;
-            _remainingHealth -= damage * (1 - damageReduction);
-            if (_remainingHealth < 0)
+            var damageReduction = CurrentArmor / MaxArmor;
+            CurrentArmor -= damage;
+            if (CurrentArmor < 0)
+                CurrentArmor = 0;
+            CurrentHealth -= damage * (1 - damageReduction);
+            if (CurrentHealth < 0)
                 Destroy(gameObject);
             //Debug.Log(gameObject.name + " took damage: " + CurrentArmor + "/" + MaxArmor + "|" + CurrentHealth + "/" + MaxHealth);
 

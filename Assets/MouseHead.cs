@@ -5,11 +5,13 @@ namespace Assets
     public class MouseHead : MonoBehaviour
     {
         private Terrain terrain;
+        private Collider mouseCollider;
         // Use this for initialization
         void Start()
         {
             terrain = FindObjectOfType<Terrain>();
             Screen.showCursor = false;
+            mouseCollider = GameObject.Find("MouseCollider").collider;
         }
 
         // Update is called once per frame
