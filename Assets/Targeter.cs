@@ -47,7 +47,8 @@ namespace Assets
         {
             foreach (var aoeTarget in AOETargets)
             {
-                aoeTarget.Debuffer.ModifySpeed(5, .25f);
+                if (aoeTarget.Debuffer != null)
+                    aoeTarget.Debuffer.AddSpeedMod("HoverSlow", 1, 0, -100);
             }
         }
     }

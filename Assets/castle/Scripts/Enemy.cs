@@ -30,6 +30,7 @@ namespace Assets.castle.Scripts
             _renderer = GetComponent<MeshRenderer>();
             _debuffer = GetComponent<DebuffHandler>();
             StartCoroutine(Attack());
+            StartCoroutine(Sprint());
         }
 
 
@@ -56,6 +57,17 @@ namespace Assets.castle.Scripts
                     _health.DoDamage(9999999);
                 }
                 yield return new WaitForSeconds(_attackCooldown);
+            }
+        }
+
+        private IEnumerator Sprint()
+        {
+            var sprintPeriod = Random.Range(5f, 10f);
+            yield return new WaitForSeconds(1);
+            while (true)
+            {
+                Debuffer.AddSpeedMod("Sprint", 10, 0, 100);
+                yield return new WaitForSeconds(sprintPeriod);
             }
         }
 
