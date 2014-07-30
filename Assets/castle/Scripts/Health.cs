@@ -67,7 +67,6 @@ namespace Assets.castle.Scripts
             CurrentHealth -= damage * (1 - damageReduction);
             if (CurrentHealth < 0)
                 Destroy(gameObject);
-            //Debug.Log(gameObject.name + " took damage: " + CurrentArmor + "/" + MaxArmor + "|" + CurrentHealth + "/" + MaxHealth);
 
         }
 

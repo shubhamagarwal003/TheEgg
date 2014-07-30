@@ -7,7 +7,7 @@ namespace Assets.castle.Scripts
     public class Enemy : MonoBehaviour
     {
 
-        private NavMeshAgent _navAgent;
+        public NavMeshAgent NavAgent { get; private set; }
         private Vector3 _destination;
         private Egg _target;
         public Health.HealthClass HealthClass;
@@ -25,21 +25,23 @@ namespace Assets.castle.Scripts
         {
             _health = GetComponent<Health>();
             _health.SetClass(HealthClass);
-            _navAgent = GetComponent<NavMeshAgent>();
+            NavAgent = GetComponent<NavMeshAgent>();
             _target = GameObject.Find("The Egg").GetComponent<Egg>();
             _renderer = GetComponent<MeshRenderer>();
             _debuffer = GetComponent<DebuffHandler>();
             StartCoroutine(Attack());
             StartCoroutine(Sprint());
+
+            NavAgent.SetDestination(
+                Physics.RaycastAll(new Ray(transform.position, _target.transform.position - transform.position))
+                    .First(a => a.transform.collider.tag == "Finish")
+                    .point - (_target.transform.position - transform.position).normalized * 5);
+            transform.rotation = Quaternion.LookRotation(NavAgent.destination - transform.position);
         }
 
 
         void Update()
         {
-            _navAgent.SetDestination(
-                Physics.RaycastAll(new Ray(transform.position, _target.transform.position - transform.position))
-                    .First(a => a.transform.collider.tag == "Finish")
-                    .point - (_target.transform.position - transform.position).normalized * 5);
         }
 
         public void DoDamage(float damage)
