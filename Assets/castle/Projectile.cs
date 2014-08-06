@@ -1,16 +1,16 @@
 ﻿using System.Collections;
 using System.Linq;
 using Assets.castle.Scripts;
+using FullInspector;
 using UnityEngine;
 
 namespace Assets
 {
-    public class Projectile : MonoBehaviour
+    public class Projectile : BaseBehavior
     {
-        [SerializeField]
-        private float Speed;
-        [SerializeField]
-        private float Acceleration;
+        private float Speed = 200;
+        private float Acceleration = 500;
+        public float Damage;
         private float speed;
         private Enemy target;
         private bool consumed = false;
@@ -28,7 +28,7 @@ namespace Assets
             particleSystem.GetParticles(particles);
             for (int i = 0; i < particles.Count(); i++)
             {
-                particles[i].lifetime *= speed/Speed;
+                particles[i].lifetime *= speed / Speed;
             }
         }
 
@@ -37,9 +37,11 @@ namespace Assets
             if (!consumed)
             {
                 consumed = true;
-                var health = col.GetComponent<Health>();
-                if (health != null)
-                    health.DoDamage(500);
+                var enemy = col.GetComponent<Enemy>();
+                if (enemy != null)
+                    enemy.DoDamage(Damage);
+
+                particleSystem.Stop();
                 Destroy(gameObject, 3);
             }
         }
@@ -62,9 +64,9 @@ namespace Assets
                     var targetPos = target.transform.position;
                     var targetDisplacement = targetPos - transform.position;
                     var estimatedImpactTime = targetDisplacement.magnitude / speed;
-                    var weight = speed/Speed;
-                    var correctedTargetPosition = targetPos  +
-                                                  estimatedImpactTime * target.NavAgent.velocity * weight/2;
+                    var weight = speed / Speed;
+                    var correctedTargetPosition = targetPos +
+                                                  estimatedImpactTime * target.NavAgent.velocity * weight / 2;
                     forward = correctedTargetPosition - transform.position;
                 }
                 transform.Translate(forward.normalized * speed * Time.deltaTime, Space.World);

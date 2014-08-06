@@ -16,6 +16,8 @@ namespace Assets.castle.Scripts
         private const float _attackDamage = 5f;
         private MeshRenderer _renderer;
 
+        public TargetManager TargetManager;
+
         private Health _health;
         public Health Health { get { return _health; } }
 
@@ -30,13 +32,15 @@ namespace Assets.castle.Scripts
             _renderer = GetComponent<MeshRenderer>();
             _debuffer = GetComponent<DebuffHandler>();
             StartCoroutine(Attack());
-            StartCoroutine(Sprint());
+            //StartCoroutine(Sprint());
 
             NavAgent.SetDestination(
                 Physics.RaycastAll(new Ray(transform.position, _target.transform.position - transform.position))
                     .First(a => a.transform.collider.tag == "Finish")
                     .point - (_target.transform.position - transform.position).normalized * 5);
             transform.rotation = Quaternion.LookRotation(NavAgent.destination - transform.position);
+            TargetManager = GameObject.Find("Castle").GetComponent<TargetManager>();
+            TargetManager.Register(this);
         }
 
 
@@ -44,9 +48,15 @@ namespace Assets.castle.Scripts
         {
         }
 
-        public void DoDamage(float damage)
+        public float DoDamage(float damage, bool hypothetical = false)
         {
-            _health.DoDamage(damage);
+            var effectiveHp = _health.DoDamage(damage, hypothetical);
+            if (Health.CurrentHealth <= 0)
+            {
+                //TargetManager.Remove(this);
+                Destroy(gameObject);
+            }
+            return effectiveHp;
         }
 
         private IEnumerator Attack()

@@ -12,6 +12,17 @@ namespace Assets.castle.Scripts
         public float CurrentArmor { get; private set; }
         public float PercentHp { get { return CurrentHealth / MaxHealth; } }
 
+        public float EffectiveHp
+        {
+            get
+            {
+                var halfArmor = CurrentArmor / 2;
+                if (halfArmor > CurrentHealth)
+                    return halfArmor;
+                return CurrentHealth + halfArmor;
+            }
+        }
+
         public enum HealthClass
         {
             Heavy,
@@ -58,18 +69,32 @@ namespace Assets.castle.Scripts
             CurrentArmor = MaxArmor;
         }
 
-        public void DoDamage(float damage)
+        public float DoDamage(float damage, bool hypothetical = false)
         {
-            var damageReduction = CurrentArmor / MaxArmor;
-            CurrentArmor -= damage;
-            if (CurrentArmor < 0)
-                CurrentArmor = 0;
-            CurrentHealth -= damage * (1 - damageReduction);
-            if (CurrentHealth < 0)
-                Destroy(gameObject);
-
+            var unmitigatedDamage = damage - CurrentArmor;
+            var remainingArmor = CurrentArmor;
+            var remainingHealth = CurrentHealth;
+            if (unmitigatedDamage > 0) // did more damage than we had armor for
+            {
+                remainingHealth -= remainingArmor * .5f + unmitigatedDamage;
+                Debug.Log(CurrentHealth + ", " + remainingHealth);
+                remainingArmor = 0;
+            }
+            else
+            {
+                remainingHealth -= damage * .5f;
+                remainingArmor -= damage;
+            }
+            if (!hypothetical)
+            {
+                CurrentArmor = remainingArmor;
+                CurrentHealth = remainingHealth;
+            }
+            var halfRemainingArmor = remainingArmor / 2;
+            if (halfRemainingArmor > remainingHealth)
+                return halfRemainingArmor;
+            return remainingHealth + halfRemainingArmor;
         }
-
 
     }
 }
